@@ -1,0 +1,22 @@
+{% extends 'shorting/base.html' %}
+{% load staticfiles %}
+{% load static %}
+
+{% block content %}
+    <form action="{% url 'shorting:mainpage' %}" method="post" id="post-form">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <div id="results"></div>
+        <button name="submit">Get short url</button>
+    </form>
+
+    {% if link %}
+        <p>The shortened url for {{link.url}} is: <a href="{% url 'shorting:redirect_view' link.short_url %}">{{link.get_short_url}}</a> </p>
+    {% endif %}
+
+
+{% endblock content %}
+
+{% block scripts %}
+   <script src='{% static "index.js" %}'></script>
+{% endblock scripts %}
