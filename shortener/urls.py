@@ -16,12 +16,13 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
-from django.contrib.staticfiles.urls import staticfiles_urlpatterns
+from django.conf.urls.static import static
 
-statics = staticfiles_urlpatterns()[0]
 
 urlpatterns = [
-    statics,
     path('thecontrolpanellieshere/', admin.site.urls),
     path('', include('shorting.urls', namespace='shorting')),
 ]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -2,3 +2,7 @@
 /venv/
 /keys.json
 /__pycache__/
+/extrastatic/images/
+/extrastatic/bootstrap4_4.min.css
+/extrastatic/jquery1_7_1.min.js
+/celerybeat-schedule.db

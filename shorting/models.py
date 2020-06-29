@@ -12,6 +12,7 @@ class Link(models.Model):
     short_url = models.CharField(max_length=MAX, unique=True, db_index=True, blank=True)
     date_created = models.DateTimeField(auto_now_add=True)
     date_updated = models.DateTimeField(auto_now=True)
+    time_called = models.PositiveIntegerField(default=0)
     active = models.BooleanField(default=True)
 
     def save(self, *args, **kwargs):

@@ -7,6 +7,8 @@ import json
 
 from shorting.models import Link
 from shorting.forms import LinkForm
+from .serializers import FormSerializer
+from .utils import SIZE
 
 
 def home(request):
@@ -53,29 +55,29 @@ class AjaxHomeView(FormView):
         return render(request, 'shorting/index.html', context)
 
     def post(self, request, *args, **kwargs):
-        self.form = self.form_class(request.POST)
-        if self.form.is_valid():
-            url = self.form.cleaned_data['url']
-            link_txt = request.POST.get('link')
-            qs = Link.objects.filter(url=url, active=True)
-            if qs.exists():
-                link_obj = qs.first()  # if this url already exists
-            else:
-                link_obj = Link.objects.create(url=url)
+        url = request.POST.get('url')
+        qs = Link.objects.filter(url=url, active=True)
+        if qs.exists():
+            link_obj = qs.first()  # if this url already exists
+        else:
+            link_serializer = FormSerializer(data={'url': url})
+            if link_serializer.is_valid():
+                link_obj = link_serializer.save()
                 err = link_obj.save()
                 if err:  # if save method suddenly returned the string, representing an error, instead of None
                     return render(request, 'shorting/creation_failure.html')
-            response_data = {}
-            response_data['result'] = 'Create post successful!'
-            response_data['pk'] = link_obj.pk  # TODO: no pk here
-            response_data['short_url'] = link_obj.get_short_url()
-            response_data['link'] = link_obj.url
-            return HttpResponse(
-                json.dumps(response_data),
-                content_type="application/json"
-            )
-        else:
-            return self.form_invalid(self.form)
+            else:
+                print('Sending error info')
+                print(link_serializer.errors)
+                return HttpResponse(json.dumps(link_serializer.errors), content_type="application/json")
+        response_data = {}
+        response_data['result'] = 'Create successful!'
+        response_data['short_url'] = link_obj.get_short_url()
+        response_data['url'] = link_obj.url
+        return HttpResponse(
+            json.dumps(response_data),
+            content_type="application/json"
+        )
 
     def form_invalid(self, form):
         context = {'form': self.form}
@@ -85,7 +87,16 @@ class AjaxHomeView(FormView):
 def redirect_view(request, shortcode):
     try:
         link_obj = Link.objects.get(short_url=shortcode)
-    except:
-        return render(request, 'shorting/wrong_shortcode.html', {'key': shortcode})
+    except Link.DoesNotExist:
+        if len(shortcode) > SIZE:
+            raise Http404
+        else:
+            return render(request, 'shorting/wrong_shortcode.html', {'key': shortcode})
+    link_obj.time_called += 1
+    link_obj.save()
     redirect_url = link_obj.url
     return redirect(to=redirect_url)
+
+
+# def err(request):
+#     return render(request, '500.html')

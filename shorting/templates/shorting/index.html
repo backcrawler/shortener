@@ -1,22 +1,54 @@
 {% extends 'shorting/base.html' %}
-{% load staticfiles %}
 {% load static %}
 
+{% block styles %}
+    <style>
+    .form-postin {
+    padding-top: 250px;
+    text-align: center;
+    }
+
+    .copy {
+    position: absolute;
+    top: 0;
+    right: 0;
+    background-size: auto;
+    background-size: 15px;
+    padding: 6px 12px;
+    border: 1px solid #d5d5d5;
+    border-top: 0;
+    border-right: 0;
+    width: 35px;
+    height: 35px;
+    vertical-align: middle;
+    cursor: pointer;
+}
+
+    .copypic {
+    position: absolute;
+    top: 5px;
+    left: 5px;
+    }
+    </style>
+{% endblock styles %}
+
 {% block content %}
+    <div class="container-fluid form-postin">
     <form action="{% url 'shorting:mainpage' %}" method="post" id="post-form">
         {% csrf_token %}
-        {{ form.as_p }}
-        <div id="results"></div>
-        <button name="submit">Get short url</button>
+        {% for field in form %}
+            {{ field }}
+        {% endfor %}
+        <button name="submit" class="btn btn-warning">Get short url</button>
+
+        <div id="results" class='alert-box alert radius'></div>
+
     </form>
-
-    {% if link %}
-        <p>The shortened url for {{link.url}} is: <a href="{% url 'shorting:redirect_view' link.short_url %}">{{link.get_short_url}}</a> </p>
-    {% endif %}
-
+        </div>
 
 {% endblock content %}
 
 {% block scripts %}
-   <script src='{% static "index.js" %}'></script>
+    <script src='{% static "index.js" %}'></script>
+    <script src='{% static "copytext.js" %}'></script>
 {% endblock scripts %}

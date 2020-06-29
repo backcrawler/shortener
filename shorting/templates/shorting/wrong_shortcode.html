@@ -2,5 +2,10 @@
 
 
 {% block content %}
-    <p>You screwed up with your {{ key }} code. It doesn't exist unfortunately</p>
+    <div class="container">
+    <div style="margin-top:250px" class="card">
+        <p>Your {{ key }} code doesn't exist unfortunately</p>
+        <p><a href="{% url 'shorting:mainpage' %}">Back to main</a></p>
+    </div>
+    </div>
 {% endblock content %}
